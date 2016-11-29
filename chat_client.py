@@ -1,22 +1,6 @@
 #coding:utf8
 import cmd, socket, traceback, threading, time
 import sys
-def inBlack(s):
-    return highlight('') + "%s[30;2m%s%s[0m"%(chr(27), s, chr(27))
-def inRed(s):
-    return highlight('') + "%s[31;2m%s%s[0m"%(chr(27), s, chr(27))
-def inGreen(s):
-    return highlight('') + "%s[32;2m%s%s[0m"%(chr(27), s, chr(27))
-def inYellow(s):
-    return highlight('') + "%s[33;2m%s%s[0m"%(chr(27), s, chr(27))
-def inBlue(s):
-    return highlight('') + "%s[34;2m%s%s[0m"%(chr(27), s, chr(27))
-def inPurple(s):
-    return highlight('') + "%s[35;2m%s%s[0m"%(chr(27), s, chr(27))
-def inWhite(s):
-    return highlight('') + "%s[37;2m%s%s[0m"%(chr(27), s, chr(27))
-def highlight(s):
-    return "%s[30;2m%s%s[1m"%(chr(27), s, chr(27))
 class ChatClient(cmd.Cmd):
     ''' chat client '''
     def __init__(self, host='localhost', port=10001):
@@ -24,7 +8,7 @@ class ChatClient(cmd.Cmd):
         self.host = host
         self.port = port
         self.sock = ''
-        self.prompt =  inRed('chatClient>')
+        self.prompt =  'chatClient>'
         self.completekey='\n'
         self.name = ''
         
@@ -33,14 +17,14 @@ class ChatClient(cmd.Cmd):
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.connect((self.host, self.port))
         s.settimeout(0.1)#设置超时时间 0.1 秒
-        print inGreen('you are connected, and you can input your name, example: name Vincent')
+        print 'you are connected, and you can input your name, example: name Vincent'
         self.sock = s
    
     def do_name(self, line):
         if not self.sock:#先得连接才能执行。
-            print inRed('please connect first')
+            print 'please connect first'
         line = line.strip()
-        self.prompt = inGreen('%s>' % line)
+        self.prompt = '%s>' % line
         self.sock.send('name\t%s' % line)#发送名字
         self.name = line
         #print 'name', line
@@ -58,19 +42,19 @@ class ChatClient(cmd.Cmd):
         
     def do_msg(self, line):
         if not line:
-            print inRed('input error, msg is empty, check it and reinput')
+            print 'input error, msg is empty, check it and reinput'
         if line:
             self.sock.send('msg\t%s' % line)
     
     def do_show(self, line):
         if not self.name:
-            print inRed('please set your name first')
+            print 'please set your name first'
         self.sock.send('show\ttmp')#发送show 和tmp
         #print 'show'
         
     def do_pm(self, line):
         if not line:
-            print inRed('input error, msg is empty, check it and reinput')
+            print 'input error, msg is empty, check it and reinput'
         if line:
             self.sock.send('pm\t%s' % line)
             
@@ -80,7 +64,7 @@ class ChatClient(cmd.Cmd):
             try:
                 msg = chatclient.sock.recv(1024) #新建对象
                 if msg:
-                    print inGreen(msg)
+                    print msg
                     sys.stdout.write(chatclient.prompt)
                     sys.stdout.flush()
                 else:
@@ -90,7 +74,7 @@ class ChatClient(cmd.Cmd):
             except:
                 traceback.print_exc()
             time.sleep(1)
-        print inRed('exit thread'), inBlue(threading.currentThread().getName())#查看当前的线程名称
+        print 'exit thread', threading.currentThread().getName()#查看当前的线程名称
        
     def do_EOF(self, line):#退出
         if self.sock:
@@ -100,12 +84,12 @@ class ChatClient(cmd.Cmd):
     
 if __name__=='__main__':
     info='''
-                     help:
+        help:
         1.connect         ---  连接到服务器
         2.name [vincent]  ---  用昵称登陆
         3.show            ---  查看当前连接人数
         4.msg [message]   ---  群发消息
         5.pm [vincent] [message]  --- 发送给某人
         '''
-    print inPurple(info)
+    print info
     ChatClient().cmdloop()
